@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moje Notatki</title>
+    <style>
+        /* Ciemny motyw dla całej strony */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .content {
+            display: none;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .note {
+            background-color: #1e1e1e;
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #333;
+        }
+
+        .note p, .note a {
+            color: #ffffff;
+        }
+
+        img {
+            max-width: 100px;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .note img {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        /* Zmieniony GIF na górze strony */
+        .header-gif {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            margin-bottom: 20px;
+        }
+
+        /* Wyśrodkowanie przycisków wyżej */
+        .center-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .center-buttons button {
+            font-size: 18px;
+            padding: 15px 30px;
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .center-buttons button:hover {
+            background-color: #444;
+        }
+
+        /* Przycisk odtwarzania muzyki w lewym dolnym rogu */
+        #playMusicBtn {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 16px;
+            padding: 10px 20px;
+            background-color: #333;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        #playMusicBtn:hover {
+            background-color: #444;
+        }
+
+        /* Regulacja głośności w prawym dolnym rogu */
+        .volume-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        .volume-control input {
+            background-color: #333;
+            border-radius: 5px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- GIF na górze strony -->
+    <img src="C:/Users/joann/Desktop/Resurces reps/lupciorepzgif.gif" class="header-gif" alt="lupciorepzgif">
+
+    <!-- Przyciski na środku strony (umieszczone wyżej) -->
+    <div class="center-buttons">
+        <button id="linkiBtn">Linki</button>
+        <button id="bestBatcheBtn">Best Batche</button>
+        <button id="discordBtn">Discord</button>
+        <button id="multiPhotoBtn">Fity</button>
+    </div>
+
+    <!-- Sekcja na notatki dla "Linki" -->
+    <div id="linkiContent" class="content">
+        <h2>Linki Notatki</h2>
+        <div id="linkiNotes"></div>
+
+        <!-- Formularz dodawania notatki -->
+        <h3>Dodaj nową notatkę</h3>
+        <textarea id="linkiDescription" placeholder="Opis..."></textarea><br>
+        <input type="text" id="linkiLink" placeholder="Link..."><br>
+        <input type="file" id="linkiImage"><br>
+        <button id="saveLinkiBtn">Zapisz notatkę</button>
+    </div>
+
+    <!-- Sekcja na notatki dla "Best Batche" -->
+    <div id="bestBatcheContent" class="content">
+        <h2>Best Batche Notatki</h2>
+        <div id="bestBatcheNotes"></div>
+
+        <!-- Formularz dodawania notatki -->
+        <h3>Dodaj nową notatkę</h3>
+        <textarea id="bestBatcheDescription" placeholder="Opis..."></textarea><br>
+        <input type="text" id="bestBatcheLink" placeholder="Link..."><br>
+        <input type="file" id="bestBatcheImage"><br>
+        <button id="saveBestBatcheBtn">Zapisz notatkę</button>
+    </div>
+
+    <!-- Sekcja na notatki dla "Fity" -->
+    <div id="multiPhotoContent" class="content">
+        <h2>Fity Notatki</h2>
+        <div id="multiPhotoNotes"></div>
+
+        <!-- Formularz dodawania notatki z wieloma zdjęciami i linkami -->
+        <h3>Dodaj nową notatkę</h3>
+        <textarea id="multiPhotoDescription" placeholder="Opis..."></textarea><br>
+        <input type="file" id="multiPhotoImages" multiple><br>
+        <input type="text" id="multiPhotoLink1" placeholder="Link 1..."><br>
+        <input type="text" id="multiPhotoLink1Name" placeholder="Nazwa Link 1..."><br>
+        <input type="text" id="multiPhotoLink2" placeholder="Link 2..."><br>
+        <input type="text" id="multiPhotoLink2Name" placeholder="Nazwa Link 2..."><br>
+        <input type="text" id="multiPhotoLink3" placeholder="Link 3..."><br>
+        <input type="text" id="multiPhotoLink3Name" placeholder="Nazwa Link 3..."><br>
+        <input type="text" id="multiPhotoLink4" placeholder="Link 4..."><br>
+        <input type="text" id="multiPhotoLink4Name" placeholder="Nazwa Link 4..."><br>
+        <button id="saveMultiPhotoBtn">Zapisz notatkę</button>
+    </div>
+
+    <!-- Odtwarzacz muzyki -->
+    <audio id="backgroundMusic"></audio>
+
+    <!-- Regulacja głośności -->
+    <div class="volume-control">
+        <label for="volumeSlider">Głośność:</label>
+        <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+    </div>
+
+    <!-- Przycisk do odtwarzania muzyki -->
+    <button id="playMusicBtn">Odtwórz Muzykę</button>
+
+    <script>
+        // Funkcja pokazująca odpowiednią sekcję
+        function showSection(section) {
+            document.querySelectorAll('.content').forEach((div) => {
+                div.style.display = 'none';
+            });
+            document.getElementById(section).style.display = 'block';
+        }
+
+        // Przycisk do "Linki" sekcji
+        document.getElementById('linkiBtn').onclick = function() {
+            showSection('linkiContent');
+        };
+
+        // Przycisk do "Best Batche" sekcji
+        document.getElementById('bestBatcheBtn').onclick = function() {
+            showSection('bestBatcheContent');
+        };
+
+        // Przycisk do "Fity" sekcji
+        document.getElementById('multiPhotoBtn').onclick = function() {
+            showSection('multiPhotoContent');
+        };
+
+        // Przycisk Discord
+        document.getElementById('discordBtn').onclick = function() {
+            window.location.href = 'https://discord.com/invite/twoj-link';
+        };
+
+        // Funkcja do zapisywania notatek w localStorage
+        function saveNote(section) {
+            const description = document.getElementById(`${section}Description`).value;
+            const link = document.getElementById(`${section}Link`).value;
+            const image = document.getElementById(`${section}Image`).files[0];
+
+            const note = document.createElement('div');
+            note.classList.add('note');
+
+            if (description) {
+                note.innerHTML += `<p>${description}</p>`;
+            }
+            if (link) {
+                note.innerHTML += `<a href="${link}" target="_blank">Link do przedmiotu</a><br>`;
+            }
+            if (image) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    note.appendChild(img);
+                }
+                reader.readAsDataURL(image);
+            }
+
+            document.getElementById(`${section}Notes`).appendChild(note);
+
+            const storedNotes = localStorage.getItem(section) ? JSON.parse(localStorage.getItem(section)) : [];
+            storedNotes.push({description, link, image: image ? image.name : ''});
+            localStorage.setItem(section, JSON.stringify(storedNotes));
+        }
+
+        // Funkcja do ładowania notatek
+        function loadNotes(section) {
+            const storedNotes = localStorage.getItem(section) ? JSON.parse(localStorage.getItem(section)) : [];
+            storedNotes.forEach(noteData => {
+                const note = document.createElement('div');
+                note.classList.add('note');
+
+                if (noteData.description) {
+                    note.innerHTML += `<p>${noteData.description}</p>`;
+                }
+                if (noteData.link) {
+                    note.innerHTML += `<a href="${noteData.link}" target="_blank">Link do przedmiotu</a><br>`;
+                }
+                if (noteData.image) {
+                    const img = document.createElement('img');
+                    img.src = noteData.image;
+                    note.appendChild(img);
+                }
+                document.getElementById(`${section}Notes`).appendChild(note);
+            });
+        }
+
+        // Przycisk zapisywania notatki dla "Linki"
+        document.getElementById('saveLinkiBtn').onclick = function() {
+            saveNote('linki');
+        };
+
+        // Przycisk zapisywania notatki dla "Best Batche"
+        document.getElementById('saveBestBatcheBtn').onclick = function() {
+            saveNote('bestBatche');
+        };
+
+        // Przycisk zapisywania notatki dla "Fity"
+        document.getElementById('saveMultiPhotoBtn').onclick = function() {
+            const description = document.getElementById('multiPhotoDescription').value;
+            const images = document.getElementById('multiPhotoImages').files;
+            const links = [
+                { url: document.getElementById('multiPhotoLink1').value, name: document.getElementById('multiPhotoLink1Name').value },
+                { url: document.getElementById('multiPhotoLink2').value, name: document.getElementById('multiPhotoLink2Name').value },
+                { url: document.getElementById('multiPhotoLink3').value, name: document.getElementById('multiPhotoLink3Name').value },
+                { url: document.getElementById('multiPhotoLink4').value, name: document.getElementById('multiPhotoLink4Name').value }
+            ];
+
+            const note = document.createElement('div');
+            note.classList.add('note');
+
+            if (description) {
+                note.innerHTML += `<p>${description}</p>`;
+            }
+
+            for (const image of images) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    note.appendChild(img);
+                }
+                reader.readAsDataURL(image);
+            }
+
+            links.forEach(link => {
+                if (link.url) {
+                    note.innerHTML += `<a href="${link.url}" target="_blank">${link.name}</a><br>`;
+                }
+            });
+
+            document.getElementById('multiPhotoNotes').appendChild(note);
+        };
+
+        // Odtwarzanie muzyki
+        const musicFiles = [
+            "C:/Users/joann/Desktop/Resurces reps/muzyczka/outway.mp3",
+            "C:/Users/joann/Desktop/Resurces reps/muzyczka/kencarson.mp3",
+            "C:/Users/joann/Desktop/Resurces reps/muzyczka/sls.mp3",
+            "C:/Users/joann/Desktop/Resurces reps/muzyczka/nomoretalk.mp3",
+            "C:/Users/joann/Desktop/Resurces reps/muzyczka/trendsetter.mp3"
+        ];
+        let currentSong = 0;
+
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        function playNextSong() {
+            backgroundMusic.src = musicFiles[currentSong];
+            backgroundMusic.play();
+            currentSong = (currentSong + 1) % musicFiles.length;
+        }
+
+        backgroundMusic.onended = playNextSong;
+
+        // Przycisk do odtwarzania muzyki
+        document.getElementById('playMusicBtn').onclick = function() {
+            playNextSong();
+        };
+
+        // Regulacja głośności
+        const volumeSlider = document.getElementById('volumeSlider');
+        volumeSlider.oninput = function() {
+            backgroundMusic.volume = this.value;
+        };
+
+        // Ładowanie notatek przy otwarciu strony
+        window.onload = function() {
+            loadNotes('linki');
+            loadNotes('bestBatche');
+            loadNotes('multiPhoto');
+        };
+    </script>
+
+</body>
+</html>
